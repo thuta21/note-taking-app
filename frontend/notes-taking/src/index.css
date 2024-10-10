@@ -23,4 +23,12 @@
   .btn-primary {
     @apply w-full my-2 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold;
   }
+
+  .icon-btn {
+    @apply text-xl text-slate-300 cursor-pointer hover:text-blue-400;
+  }
+
+  .input-label {
+    @apply text-sm text-slate-400;
+  }
 }
