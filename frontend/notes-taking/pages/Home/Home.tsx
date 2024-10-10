@@ -51,7 +51,11 @@ const Home = () => {
         contentLabel="Add/Edit Note"
         className='w-[40%] max-h-3/4 bg-white rounded-md shadow-lg p-5 mx-auto mt-14 overflow-scroll'
       >
-        <AddEditNotes />
+        <AddEditNotes
+          noteData={showAddEditNote.data}
+          type={showAddEditNote.type}
+          onClose={() => setShowAddEditNote({ isShowed: false, type: 'add', data: null })}
+        />
       </Modal>
     </div>
   )
