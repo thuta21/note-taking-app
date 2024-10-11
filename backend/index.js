@@ -1,24 +1,20 @@
 import express, { json } from 'express';
 import cors from 'cors';
-const app = express();
-import AppError from "./helpers/appError.js";
-import errorHandler from "./helpers/errorHandler.js";
-import headers from "./helpers/header.js";
-// const jwt = require('jsonwebtoken');
-// const bcrypt = require('bcrypt');
-// const { authenticateToken } = require('./utils');
+import AppError from "./utils/appError.js";
+import errorHandler from "./utils/errorHandler.js";
+import headers from "./utils/header.js";
 import router from './routes/index.js';
 import bodyParser from 'body-parser';
-import './mongoDb/config.js';
+import './database/connection.js';
 import dotenv from 'dotenv';
 dotenv.config();
+
+const app = express();
 
 app.use(cors({ origin: '*' }));
 app.use(json());
 app.use(bodyParser.urlencoded({extended: false }));
 app.use(router);
-
-// import User from './models/user';
 
 app.all("*", (req, res, next) => {
   next(new AppError(`The URL ${req.originalUrl} does not exists`, 404));
