@@ -1,25 +1,35 @@
-import React from 'react'
-import Home from '../pages/Home/Home'
-import Login from '../pages/Login/Login'
-import Register from '../pages/Register/Register'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Home from '../pages/Home/Home';
+import Login from '../pages/Login/Login';
+import Register from '../pages/Register/Register';
+import { AuthProvider, useAuth } from '../middleware/AuthContext';
+import ProtectedRoute from '../middleware/ProtectedRoute';
 
-const routes = (
-  <Router>
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-    </Routes>
-  </Router>
-)
+const AuthRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
 
 const App = () => {
   return (
-    <div>
-      {routes}
-    </div>
-  )
-}
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/dashboard" element={<ProtectedRoute><Home /></ProtectedRoute>} />
 
-export default App
+          <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+          <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
+
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+};
+
+export default App;

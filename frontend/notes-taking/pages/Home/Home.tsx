@@ -1,24 +1,45 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from '../../components/Navbar/Navbar'
 import Notes from '../../components/Cards/Notes'
 import AddEditNotes from './AddEditNotes'
 import { MdAddCircle } from 'react-icons/md'
 import Modal from 'react-modal'
+import { getUser } from './api'
 
 const Home = () => {
-
-  const [ showAddEditNote, setShowAddEditNote ] = useState({
+  const [showAddEditNote, setShowAddEditNote] = useState({
     isShowed: false,
     type: 'add',
     data: null
   });
 
+  const [userInfo, setUserInfo] = useState(null);
+
+  // Fetch user info using async function in useEffect
+  const getUserInfo = async () => {
+    try {
+      const response = await getUser();
+
+      if (response.status === 200) {
+        setUserInfo(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // Use useEffect to call getUserInfo when the component mounts
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
   return (
     <div>
-      <Navbar />
+      <Navbar userInfo={userInfo}/>
 
       <div className='container mx-auto'>
         <div className='grid grid-cols-3 gap-4 mt-8'>
+          {/* Sample note */}
           <Notes
             title={"Note One"}
             date={"3rd April 2025"}
@@ -61,4 +82,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Home;
