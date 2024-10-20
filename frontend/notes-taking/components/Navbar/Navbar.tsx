@@ -2,27 +2,48 @@ import React, { useState } from 'react';
 import ProfileInfo from '../Cards/ProfileInfo';
 import SearchBar from '../SearchBar/SearchBar';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../middleware/AuthContext'; // Import the Auth context
+import { useAuth } from '../../middleware/AuthContext';
+import axios from 'axios'; // Import Axios
 
-const Navbar = ({ userInfo }) => {
+const Navbar = ({ userInfo, setNotes }) => { // Pass setNotes to update the notes list
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
-  const { logout } = useAuth(); // Get the logout function from AuthContext
+  const { logout } = useAuth();
 
   const onLogout = () => {
-    // Call the logout function to update the context state
     logout();
-
-    // Navigate to login page after logout
     navigate('/login');
   };
 
-  const handleSearch = () => {
-    // Handle search functionality here
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+      Authorization: `Bearer ${token}`,
+    };
   };
 
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/notes', { // Ensure the URL is correct
+        params: { searchQuery: searchValue },
+        headers: getAuthHeaders(), // Include auth headers
+      });
+      setNotes(response.data); // Update the notes in the parent component
+    } catch (error) {
+      console.error('Error searching notes:', error);
+    }
+  };
+
+
   const onClearSearch = () => {
-    setSearchValue('');
+    setSearchValue(''); // Clear the input
+    handleSearch(); // Fetch all notes when search is cleared
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(); // Trigger search when Enter is pressed
+    }
   };
 
   return (
@@ -34,9 +55,9 @@ const Navbar = ({ userInfo }) => {
         onChange={(e) => setSearchValue(e.target.value)}
         handleSearch={handleSearch}
         onClearSearch={onClearSearch}
+        onKeyDown={handleKeyDown} // Add the keyDown event to handle Enter press
       />
 
-      {/* Pass userInfo down to ProfileInfo */}
       <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
     </div>
   );

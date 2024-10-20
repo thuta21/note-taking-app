@@ -2,11 +2,23 @@ import Note from '../models/note.js';
 
 const index = async (req, res) => {
 	const { id } = req.user;
+	const { searchQuery } = req.query;
+
 	try {
-		const notes = await Note.find({ userId: id });
-		return res.status(200).json(notes);
+	  const query = {
+		userId: id,
+		...(searchQuery && {
+		  $or: [
+			{ title: { $regex: searchQuery, $options: "i" } },
+			{ content: { $regex: searchQuery, $options: "i" } }
+		  ]
+		})
+	  };
+
+	  const notes = await Note.find(query);
+	  return res.status(200).json(notes);
 	} catch (error) {
-		return res.status(500).json({ error: error.message });
+	  return res.status(500).json({ error: error.message });
 	}
 };
 
